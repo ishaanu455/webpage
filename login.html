@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Login Form</title>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f8fafc 100%);
+    }
+    .login-box {
+      width: 340px;
+      padding: 36px 32px 48px 32px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(60, 80, 180, 0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow 0.3s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    .login-box.success {
+      animation: fadeOut 0.7s forwards;
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: scale(0.96) translateY(30px); }
+    }
+    .login-box h2 {
+      margin-bottom: 28px;
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 2rem;
+      letter-spacing: 0.5px;
+    }
+    .input-group {
+      width: 100%;
+      max-width: 276px;
+      position: relative;
+      margin-bottom: 22px;
+      box-sizing: border-box;
+    }
+    .login-box input {
+      width: 100%;
+      padding: 14px 44px 14px 14px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #f1f5f9;
+      color: #334155;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s, background 0.2s, padding-top 0.2s;
+      box-shadow: 0 1px 2px rgba(60, 80, 180, 0.03);
+      position: relative;
+      z-index: 1;
+      box-sizing: border-box;
+    }
+    .login-box input:focus {
+      border: 1.5px solid #6366f1;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+    }
+    .input-group.filled input {
+      border: 1.5px solid #22c55e;
+      background: #f0fdf4;
+      box-shadow: 0 2px 8px rgba(34,197,94,0.10);
+    }
+    .input-group .checkmark {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%) scale(0.7);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      color: #22c55e;
+      font-size: 1.3em;
+    }
+    .input-group.filled .checkmark {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
+    .input-group.focused input,
+    .input-group.filled input {
+      padding-top: 24px;
+    }
+    .placeholder-anim {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 1rem;
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(.68,-0.55,.27,1.55);
+      background: transparent;
+      z-index: 2;
+    }
+    .input-group.focused .placeholder-anim,
+    .input-group.filled .placeholder-anim {
+      top: 7px;
+      left: 10px;
+      font-size: 0.82rem;
+      color: #6366f1;
+      background: #fff;
+      padding: 0 4px;
+      border-radius: 4px;
+      transform: none;
+    }
+    .login-btn {
+      position: absolute;
+      padding: 12px 36px;
+      background: linear-gradient(90deg, #6366f1 0%, #2563eb 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.08rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 2px 12px rgba(99, 102, 241, 0.10);
+      transition: left 0.13s cubic-bezier(.68,-0.55,.27,1.55), top 0.13s cubic-bezier(.68,-0.55,.27,1.55), background 0.2s, box-shadow 0.2s, transform 0.13s;
+      z-index: 2;
+      top: 0; /* Will be set by JS */
+      left: 0; /* Will be set by JS */
+      overflow: hidden;
+      min-width: 120px;
+    }
+    .login-btn.ready {
+      background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important;
+      box-shadow: 0 0 0 4px #bbf7d0, 0 4px 16px rgba(34,197,94,0.18) !important;
+      animation: readyPulse 0.7s;
+    }
+    @keyframes readyPulse {
+      0% { box-shadow: 0 0 0 0 #bbf7d0, 0 4px 16px rgba(34,197,94,0.18); }
+      60% { box-shadow: 0 0 0 8px #bbf7d0, 0 4px 16px rgba(34,197,94,0.18); }
+      100% { box-shadow: 0 0 0 4px #bbf7d0, 0 4px 16px rgba(34,197,94,0.18); }
+    }
+    .login-btn.escaping {
+      animation: shake 0.4s;
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-8px); }
+      80% { transform: translateX(8px); }
+      100% { transform: translateX(0); }
+    }
+    .login-btn.wiggle {
+      animation: wiggle 0.4s;
+    }
+    @keyframes wiggle {
+      0% { transform: rotate(0deg); }
+      20% { transform: rotate(-7deg); }
+      40% { transform: rotate(7deg); }
+      60% { transform: rotate(-7deg); }
+      80% { transform: rotate(7deg); }
+      100% { transform: rotate(0deg); }
+    }
+    .login-btn.jump {
+      animation: cute-bounce 0.22s;
+    }
+    @keyframes cute-bounce {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.18, 0.92); }
+      70% { transform: scale(0.95, 1.08); }
+      100% { transform: scale(1); }
+    }
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(99, 102, 241, 0.18);
+      pointer-events: none;
+      width: 10px;
+      height: 10px;
+      opacity: 0.7;
+      animation: ripple-anim 0.6s linear forwards;
+      z-index: 1;
+    }
+    @keyframes ripple-anim {
+      to {
+        width: 120px;
+        height: 120px;
+        opacity: 0;
+        left: -55px;
+        top: -55px;
+      }
+    }
+    .login-btn.success {
+      background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%) !important;
+      color: #fff;
+      pointer-events: none;
+      transition: background 0.3s, color 0.3s;
+    }
+    .login-btn .checkmark-success {
+      display: none;
+      font-size: 1.4em;
+      vertical-align: middle;
+      margin-left: 8px;
+      color: #fff;
+      animation: checkAppear 0.5s;
+    }
+    .login-btn.success .checkmark-success {
+      display: inline;
+    }
+    @keyframes checkAppear {
+      from { opacity: 0; transform: scale(0.7); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    /* Add overlay for green animation */
+    .success-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(120deg, #bbf7d0 0%, #22c55e 100%);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      transition: opacity 0.7s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+    .success-overlay.active {
+      opacity: 0.45;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box" id="loginBox">
+    <h2>Login</h2>
+    <div class="input-group" id="userGroup">
+      <input type="text" id="username" autocomplete="off">
+      <span class="placeholder-anim">Username</span>
+      <span class="checkmark">✔</span>
+    </div>
+    <div class="input-group" id="passGroup">
+      <input type="password" id="password" autocomplete="off">
+      <span class="placeholder-anim">Password</span>
+      <span class="checkmark">✔</span>
+    </div>
+    <button class="login-btn" id="loginBtn">Login</button>
+  </div>
+  <div class="success-overlay" id="successOverlay"></div>
+  <script>
+    const loginBox = document.getElementById('loginBox');
+    const loginBtn = document.getElementById('loginBtn');
+    const username = document.getElementById('username');
+    const password = document.getElementById('password');
+    const userGroup = document.getElementById('userGroup');
+    const passGroup = document.getElementById('passGroup');
+    const successOverlay = document.getElementById('successOverlay');
+
+    // Placeholder animation
+    function updateInputGroup(group, input) {
+      if (input === document.activeElement) {
+        group.classList.add('focused');
+      } else {
+        group.classList.remove('focused');
+      }
+      if (input.value.trim() !== '') {
+        group.classList.add('filled');
+      } else {
+        group.classList.remove('filled');
+      }
+    }
+    username.addEventListener('focus', () => updateInputGroup(userGroup, username));
+    username.addEventListener('blur', () => updateInputGroup(userGroup, username));
+    username.addEventListener('input', () => updateInputGroup(userGroup, username));
+    password.addEventListener('focus', () => updateInputGroup(passGroup, password));
+    password.addEventListener('blur', () => updateInputGroup(passGroup, password));
+    password.addEventListener('input', () => updateInputGroup(passGroup, password));
+    // Initial state
+    updateInputGroup(userGroup, username);
+    updateInputGroup(passGroup, password);
+
+    function isFilled() {
+      return username.value.trim() !== '' && password.value.trim() !== '';
+    }
+
+    // Ripple effect
+    function showRipple(x, y) {
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      ripple.style.left = (x - loginBtn.getBoundingClientRect().left - 5) + 'px';
+      ripple.style.top = (y - loginBtn.getBoundingClientRect().top - 5) + 'px';
+      loginBtn.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+    }
+
+    // Utility to center the button horizontally in the login box
+    function centerButtonHorizontally(top = null) {
+      // Center relative to input fields
+      const inputGroup = document.querySelector('.input-group');
+      const inputRect = inputGroup.getBoundingClientRect();
+      const boxRect = loginBox.getBoundingClientRect();
+      const btnRect = loginBtn.getBoundingClientRect();
+      // left edge of input relative to box
+      const inputLeft = inputRect.left - boxRect.left;
+      const inputWidth = inputRect.width;
+      const left = inputLeft + (inputWidth - btnRect.width) / 2;
+      if (top === null) {
+        // Default: 32px from bottom
+        top = boxRect.height - btnRect.height - 32;
+      }
+      loginBtn.style.left = `${left}px`;
+      loginBtn.style.top = `${top}px`;
+      loginBtn.style.bottom = '';
+      loginBtn.style.transform = '';
+    }
+
+    // Update moveButton to use centerButtonHorizontally
+    function moveButton(mouseX, mouseY) {
+      const inputGroup = document.querySelector('.input-group');
+      const inputRect = inputGroup.getBoundingClientRect();
+      const boxRect = loginBox.getBoundingClientRect();
+      const btnRect = loginBtn.getBoundingClientRect();
+      const padding = 10;
+      // Area to avoid (inputs)
+      const avoidTop = inputRect.top - boxRect.top - 8;
+      const avoidBottom = avoidTop + inputRect.height * 2 + 16; // both fields + margin
+      const minLeft = padding;
+      const maxLeft = boxRect.width - btnRect.width - padding;
+      const minTop = padding;
+      const maxTop = boxRect.height - btnRect.height - padding;
+      let left, top;
+      let attempts = 0;
+      const minDistance = 80; // px
+      do {
+        left = Math.random() * (maxLeft - minLeft) + minLeft;
+        top = Math.random() * (maxTop - minTop) + minTop;
+        // Avoid overlapping input fields
+        if (top + btnRect.height > avoidTop && top < avoidBottom) {
+          attempts++;
+          if (attempts > 30) break;
+          continue;
+        }
+        // Calculate button center
+        const btnCenterX = boxRect.left + left + btnRect.width / 2;
+        const btnCenterY = boxRect.top + top + btnRect.height / 2;
+        const dist = Math.sqrt((btnCenterX - mouseX) ** 2 + (btnCenterY - mouseY) ** 2);
+        if (dist > minDistance || attempts > 30) break;
+        attempts++;
+      } while (true);
+      loginBtn.classList.add('jump');
+      setTimeout(() => loginBtn.classList.remove('jump'), 220);
+      loginBtn.style.left = `${left}px`;
+      loginBtn.style.top = `${top}px`;
+      loginBtn.style.bottom = '';
+      loginBtn.style.transform = '';
+      // Show ripple at new position
+      showRipple(boxRect.left + left + btnRect.width/2, boxRect.top + top + btnRect.height/2);
+    }
+
+    // Update resetButton to use centerButtonHorizontally
+    function resetButton() {
+      centerButtonHorizontally();
+    }
+
+    function showReadyAnimation() {
+      loginBtn.classList.add('ready');
+      // Show overlay
+      successOverlay.classList.add('active');
+      setTimeout(() => {
+        loginBtn.classList.remove('ready');
+        successOverlay.classList.remove('active');
+      }, 700);
+    }
+
+    function checkReadyAnimation() {
+      if (isFilled()) {
+        showReadyAnimation();
+      }
+    }
+
+    // Button shake when escaping
+    function shakeButton() {
+      loginBtn.classList.add('escaping');
+      setTimeout(() => loginBtn.classList.remove('escaping'), 400);
+    }
+
+    // Button wiggle on hover before moving
+    let wiggleTimeout = null;
+    loginBtn.addEventListener('mouseenter', function(e) {
+      if (!isFilled()) {
+        let mouseX = e.clientX || (window.innerWidth / 2);
+        let mouseY = e.clientY || (window.innerHeight / 2);
+        moveButton(mouseX, mouseY);
+      }
+    });
+
+    loginBtn.addEventListener('mouseleave', function() {
+      loginBtn.classList.remove('wiggle');
+      clearTimeout(wiggleTimeout);
+    });
+
+    loginBtn.addEventListener('click', function(e) {
+      if (!isFilled()) {
+        moveButton(e.clientX, e.clientY);
+        e.preventDefault();
+      } else {
+        // Success animation
+        loginBtn.classList.add('success');
+        setTimeout(() => {
+          loginBox.classList.add('success');
+        }, 500);
+        setTimeout(() => {
+          loginBtn.classList.remove('success');
+          username.value = '';
+          password.value = '';
+          updateInputGroup(userGroup, username);
+          updateInputGroup(passGroup, password);
+          resetButton();
+        }, 1800);
+      }
+    });
+
+    // When user types, immediately reset button to default place
+    username.addEventListener('input', function() {
+      resetButton();
+      if (isFilled()) checkReadyAnimation();
+      updateInputGroup(userGroup, username);
+    });
+    password.addEventListener('input', function() {
+      resetButton();
+      if (isFilled()) checkReadyAnimation();
+      updateInputGroup(passGroup, password);
+    });
+
+    // When mouse leaves the login box, reset button
+    loginBox.addEventListener('mouseleave', function() {
+      resetButton();
+    });
+
+    // Utility to check if mouse is over the button
+    function isMouseOverButton() {
+      const btnRect = loginBtn.getBoundingClientRect();
+      const mouseX = window._lastMouseX;
+      const mouseY = window._lastMouseY;
+      if (mouseX == null || mouseY == null) return false;
+      return (
+        mouseX >= btnRect.left && mouseX <= btnRect.right &&
+        mouseY >= btnRect.top && mouseY <= btnRect.bottom
+      );
+    }
+
+    // Track last mouse position globally
+    window._lastMouseX = null;
+    window._lastMouseY = null;
+    document.addEventListener('mousemove', function(e) {
+      window._lastMouseX = e.clientX;
+      window._lastMouseY = e.clientY;
+    });
+
+    // On mouseenter of login box, if mouse is over button and fields are empty, move button
+    loginBox.addEventListener('mouseenter', function() {
+      if (!isFilled() && isMouseOverButton()) {
+        moveButton(window._lastMouseX, window._lastMouseY);
+      }
+    });
+
+    // After resetButton, if mouse is inside box and over button, move it again
+    function isMouseInBox() {
+      const boxRect = loginBox.getBoundingClientRect();
+      const mouseX = window._lastMouseX;
+      const mouseY = window._lastMouseY;
+      if (mouseX == null || mouseY == null) return false;
+      return (
+        mouseX >= boxRect.left && mouseX <= boxRect.right &&
+        mouseY >= boxRect.top && mouseY <= boxRect.bottom
+      );
+    }
+
+    const _origResetButton = resetButton;
+    resetButton = function() {
+      _origResetButton();
+      setTimeout(() => {
+        if (!isFilled() && isMouseInBox() && isMouseOverButton()) {
+          moveButton(window._lastMouseX, window._lastMouseY);
+        }
+      }, 10);
+    }
+
+    // Ensure centering after DOM load, window resize, and after font load
+    window.addEventListener('DOMContentLoaded', () => {
+      centerButtonHorizontally();
+      // If font is loaded after DOMContentLoaded, recenter
+      if (document.fonts) {
+        document.fonts.ready.then(centerButtonHorizontally);
+      }
+    });
+    window.addEventListener('resize', centerButtonHorizontally);
+
+    // On mousemove inside the login box, if fields are empty and mouse is over button, move button
+    loginBox.addEventListener('mousemove', function() {
+      if (!isFilled() && isMouseOverButton()) {
+        moveButton(window._lastMouseX, window._lastMouseY);
+      }
+    });
+  </script>
+</body>
+</html> 
